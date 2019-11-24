@@ -1,0 +1,22 @@
+{
+  "name": "scouts-elections-server",
+  "version": "1.0.0",
+  "description": "The server to handle synchronization between multiple devices for a single election.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/V-ed/Scouts-Elections-Server.git"
+  },
+  "author": "Guillaume Marcoux",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/V-ed/Scouts-Elections-Server/issues"
+  },
+  "homepage": "https://github.com/V-ed/Scouts-Elections-Server#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
