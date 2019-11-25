@@ -5,6 +5,8 @@ const sqlite3 = require('sqlite3').verbose();
 const app = express();
 const upload = multer();
 
+const PORT = 3000;
+
 let db = new sqlite3.Database("./db/elections.db", err => {
 	if (err) {
 		console.error(err.message);
@@ -33,6 +35,6 @@ app.get("/vote", upload.none(), (req, res) => {
 	
 });
 
-app.listen(3000, () => {
-	console.log("Scouts Elections Server app listening on port 3000!");
+app.listen(PORT, () => {
+	console.log(`Scouts Elections Server app listening on port ${PORT}!`);
 });
