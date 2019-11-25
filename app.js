@@ -8,7 +8,10 @@ let db = new sqlite3.Database('./db/elections.db', (err) => {
 	if (err) {
 		console.error(err.message);
 	}
-	console.log('Connected to the elections database.');
+	else {
+		// Connected to database successfully
+		console.log('Connected to the elections database.');
+	}
 });
 
 app.get('/', function (req, res) {
