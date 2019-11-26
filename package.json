@@ -5,10 +5,11 @@
   "main": "app.js",
   "scripts": {
 	"lint": "eslint .",
-	"precommit-checklint-msg": "echo 'Checking code lint...' && exit 0"
+	"precommit-checklint-msg": "echo 'Checking code lint...' && exit 0",
+	"precommit-checklint-msg-success": "echo 'Code lint OK!' && exit 0"
   },
   "precommit.silent": true,
-  "pre-commit": [ "precommit-checklint-msg", "lint" ],
+  "pre-commit": [ "precommit-checklint-msg", "lint", "precommit-checklint-msg-success" ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/V-ed/Scouts-Elections-Server.git"
