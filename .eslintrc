@@ -1,0 +1,19 @@
+{
+	"parserOptions": {
+		"ecmaVersion": 6,
+		"sourceType": "module"
+	},
+	"env": {
+		"node": true,
+		"es6": true
+	},
+	"extends": "eslint:recommended",
+	"rules": {
+		"no-empty": "error",
+		"no-multiple-empty-lines": "error",
+		"no-var": "error",
+		"linebreak-style": ["warn", "unix"],
+		"indent": ["error", "tab"],
+		"no-trailing-spaces": ["error", { "skipBlankLines": true, "ignoreComments": true }]
+	}
+}
