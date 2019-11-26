@@ -4,8 +4,11 @@
   "description": "The server to handle synchronization between multiple devices for a single election.",
   "main": "app.js",
   "scripts": {
-    "test": "eslint ."
+	"lint": "eslint .",
+	"precommit-checklint-msg": "echo 'Checking code lint...' && exit 0"
   },
+  "precommit.silent": true,
+  "pre-commit": [ "precommit-checklint-msg", "lint" ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/V-ed/Scouts-Elections-Server.git"
@@ -23,6 +26,7 @@
     "sqlite3": "^4.1.0"
   },
   "devDependencies": {
-    "eslint": "^6.7.1"
+    "eslint": "^6.7.1",
+    "pre-commit": "^1.2.2"
   }
 }
