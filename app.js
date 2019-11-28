@@ -1,11 +1,13 @@
 const express = require('express');
 const multer = require('multer');
 // const sqlite3 = require('sqlite3').verbose();
+const fs = require('fs');
+const https = require('https');
 
 const app = express();
 const upload = multer();
 
-const PORT = 3000;
+const PORT = 3001;
 
 // let db = new sqlite3.Database("./db/elections.db", err => {
 // 	if (err) {
@@ -35,6 +37,20 @@ app.get("/vote", upload.none(), (req, res) => {
 	
 });
 
-app.listen(PORT, () => {
-	console.log(`Scouts Elections Server app listening on port ${PORT}!`);
+// Certificate
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/ved.ddnsfree.com/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/ved.ddnsfree.com/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/ved.ddnsfree.com/chain.pem', 'utf8');
+
+const credentials = {
+	key: privateKey,
+	cert: certificate,
+	ca: ca
+};
+
+// Starting server
+const httpsServer = https.createServer(credentials, app);
+
+httpsServer.listen(PORT, () => {
+	console.log(`HTTPS : Scouts Elections Server app listening on port ${PORT}!`);
 });
