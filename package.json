@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "The server to handle synchronization between multiple devices for a single election.",
   "main": "app.js",
+  "type": "module",
   "scripts": {
 	"lint": "eslint .",
 	"precommit-lint": "eslint . || (echo '\\e[1;31mCannot commit : Please fix above ESLint issues first!\\e[m' && exit 1)",
