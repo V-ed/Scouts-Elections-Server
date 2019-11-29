@@ -13,17 +13,17 @@ const upload = multer();
 // 	}
 // });
 
-exports.setup = (app, webroot) => {
+exports.setup = (app, route) => {
 	
-	app.get(`${webroot}`, (req, res) => {
+	app.get(route('/'), (req, res) => {
 		res.send("Hello World!");
 	});
 	
-	app.get(`${webroot}/create`, (req, res) => {
+	app.get(route('/create'), (req, res) => {
 		res.json({ code: Math.round(Math.random() * 10) });
 	});
 	
-	app.get(`${webroot}/vote`, upload.none(), (req, res) => {
+	app.get(route('/vote'), upload.none(), (req, res) => {
 		
 		const formData = req.body;
 		
