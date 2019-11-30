@@ -16,9 +16,19 @@ class ElectionController {
 		
 		const formData = req.body;
 		
-		let jsonData = JSON.parse(formData.data);
-		
-		res.json({ code: Math.round(Math.random() * 10), data: jsonData });
+		if (!formData) {
+			// No data given in multipart form, send missing data error.
+			res.status(400);
+			res.send('No data given!');
+			
+		}
+		else {
+			
+			let jsonData = JSON.parse(formData.data);
+			
+			res.json({ code: Math.round(Math.random() * 10), data: jsonData });
+			
+		}
 		
 	}
 	
