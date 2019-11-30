@@ -23,7 +23,7 @@ class ElectionController {
 	}
 	
 	static vote(req, res) {
-		res.json({ code: req.params.electionCode, candidateId: req.params.candidateId });
+		res.json({ code: req.params.electionCode });
 	}
 	
 	static retrieve(req, res) {
