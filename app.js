@@ -1,7 +1,4 @@
-const multer = require('multer');
 // const sqlite3 = require('sqlite3').verbose();
-
-const upload = multer();
 
 // let db = new sqlite3.Database(`${__dirname}/db/elections.db`, err => {
 // 	if (err) {
@@ -13,24 +10,28 @@ const upload = multer();
 // 	}
 // });
 
-exports.setup = (app, route) => {
+class ElectionController {
 	
-	app.get(route('/'), (req, res) => {
-		res.send("Hello World!");
-	});
-	
-	app.get(route('/create'), (req, res) => {
-		res.json({ code: Math.round(Math.random() * 10) });
-	});
-	
-	app.get(route('/vote'), upload.none(), (req, res) => {
+	static create(req, res) {
 		
 		const formData = req.body;
 		
 		let jsonData = JSON.parse(formData.data);
 		
-		res.json({ code: formData.code, data: jsonData });
+		res.json({ code: Math.round(Math.random() * 10), data: jsonData });
 		
-	});
+	}
+	
+	static vote(req, res) {
+		res.json({ code: req.params.electionCode, candidateId: req.params.candidateId });
+	}
+	
+	static retrieve(req, res) {
+		res.send("Hello World!");
+	}
 	
 }
+
+module.exports = {
+	ElectionController: ElectionController
+};
