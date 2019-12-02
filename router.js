@@ -5,9 +5,9 @@ const upload = multer();
 
 exports.setup = (app, route) => {
 	
-	app.get(route('/create'), upload.none(), ElectionController.create);
+	app.post(route('/create'), upload.none(), ElectionController.create);
 	
-	app.put(route('/:electionCode/vote'), ElectionController.vote);
+	app.put(route('/:electionCode/vote'), upload.none(), ElectionController.vote);
 	
 	app.get(route('/:electionCode/retrieve'), ElectionController.retrieve);
 	
