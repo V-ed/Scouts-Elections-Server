@@ -3,12 +3,14 @@ const sqlite3 = require('sqlite3').verbose();
 
 class SQLiteDatabase {
 	
-	constructor(filePath) {
+	constructor(filePath, onCreateExecuteCallback) {
 		
 		this._filePath = filePath;
 		
 		try {
-			this.isNew = !fs.existsSync(filePath);
+			if (onCreateExecuteCallback && !fs.existsSync(filePath)) {
+				this.execute(onCreateExecuteCallback);
+			}
 		}
 		catch (err) {
 			console.error(err);

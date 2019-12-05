@@ -1,12 +1,8 @@
 const { SQLiteDatabase } = require('./database');
 
-const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`);
-
-if (dbWrapper.isNew) {
-	
-	dbWrapper.execute(db => db.run('CREATE TABLE elections(id text PRIMARY KEY, data text NOT NULL, picture text, numberOfJoined DEFAULT 0)'));
-	
-}
+const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`, db => {
+	db.run('CREATE TABLE elections(id text PRIMARY KEY, data text NOT NULL, picture text, numberOfJoined DEFAULT 0)');
+});
 
 function createCode(length) {
 	
