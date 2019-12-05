@@ -39,9 +39,7 @@ class ElectionController {
 				
 				code = createCode(6);
 				
-				const sqlGetRowQuery = "SELECT id FROM elections WHERE id = ?";
-				
-				const row = db.prepare(sqlGetRowQuery).get(code);
+				const row = db.prepare("SELECT id FROM elections WHERE id = ?").get(code);
 				
 				// If row present, code is invalid
 				if (row) {
