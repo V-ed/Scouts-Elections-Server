@@ -1,14 +1,25 @@
-// const sqlite3 = require('sqlite3').verbose();
+const { SQLiteDatabase } = require('./database');
 
-// let db = new sqlite3.Database(`${__dirname}/db/elections.db`, err => {
-// 	if (err) {
-// 		console.error(err.message);
-// 	}
-// 	else {
-// 		// Connected to database successfully
-// 		console.log("Connected to the elections database.");
-// 	}
-// });
+const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`);
+
+if (dbWrapper.isNew) {
+	
+	dbWrapper.execute(db => db.run('CREATE TABLE elections(id text PRIMARY KEY, data text NOT NULL, picture text, numberOfJoined DEFAULT 0)'));
+	
+}
+
+function createCode(length) {
+	
+	let result = '';
+	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+	const charactersLength = characters.length;
+	
+	for (let i = 0; i < length; i++) {
+		result += characters.charAt(Math.floor(Math.random() * charactersLength));
+	}
+	return result;
+	
+}
 
 class ElectionController {
 	
@@ -24,12 +35,48 @@ class ElectionController {
 		}
 		else {
 			
+			let code;
+			
+			const db = dbWrapper.get();
+			
+			do {
+				
+				code = createCode(6);
+				
+				const sqlGetRowQuery = "SELECT id FROM elections WHERE id = ?";
+				
+				db.get(sqlGetRowQuery, [code], (err, row) => {
+					
+					if (err) {
+						return console.error(err);
+					}
+					
+					// If a row is present, code is invalid
+					if (row) {
+						code = undefined;
+					}
+					
+				});
+				
+			} while (!code);
+			
 			let jsonData = JSON.parse(formData.data);
 			
-			res.json({ code: Math.round(Math.random() * 10), data: jsonData });
+			const pictureData = jsonData.groupImage;
+			delete jsonData.groupImage;
+			
+			const dbJsonData = JSON.stringify(jsonData);
+			
+			db.run(`INSERT INTO elections(id, data, picture) VALUES(?, ?, ?)`, [code, dbJsonData, pictureData]);
+			
+			res.json({ code: code, data: jsonData });
 			
 		}
 		
+	}
+	
+	static join(req, res) {
+		res.json({ code: req.params.electionCode });
 	}
 	
 	static vote(req, res) {
@@ -37,7 +84,7 @@ class ElectionController {
 	}
 	
 	static retrieve(req, res) {
-		res.send("Hello World!");
+		res.json({ code: req.params.electionCode });
 	}
 	
 }
