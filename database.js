@@ -6,28 +6,35 @@ class SQLiteDatabase {
 	constructor(filePath, onCreateExecuteCallback) {
 		
 		this._filePath = filePath;
+		this._onCreateExecuteCallback = onCreateExecuteCallback;
+		
+		this._openConnection(filePath, onCreateExecuteCallback).close();
+		
+		process.on('exit', () => this.close());
+		
+	}
+	
+	_openConnection(filePath, onCreateExecuteCallback) {
+		
+		const db = new Database(filePath);
 		
 		try {
-			if (onCreateExecuteCallback && !fs.existsSync(filePath)) {
-				this.execute(onCreateExecuteCallback);
+			if (onCreateExecuteCallback && !this.db && !fs.existsSync(filePath)) {
+				this.execute(onCreateExecuteCallback, db);
 			}
 		}
 		catch (err) {
 			console.error(err);
 		}
 		
-		process.on('exit', () => this.close());
+		return db;
 		
-	}
-	
-	_openConnection(filePath) {
-		return new Database(filePath);
 	}
 	
 	get() {
 		
 		if (!this.db) {
-			this.db = this._openConnection(this._filePath);
+			this.db = this._openConnection(this._filePath, this._onCreateExecuteCallback);
 		}
 		
 		clearTimeout(this._timeout);
@@ -40,17 +47,19 @@ class SQLiteDatabase {
 		
 	}
 	
-	execute(callback) {
+	execute(callback, database) {
 		
 		if (!callback) {
 			throw "Callback parameter is required for this function to run.";
 		}
 		
-		const db = this.db || this._openConnection(this._filePath);
+		const db = database || this.db || this._openConnection(this._filePath, this._onCreateExecuteCallback);
 		
 		callback(db);
 		
-		this.close(db);
+		if (!database) {
+			this.close(db);
+		}
 		
 	}
 	
