@@ -16,10 +16,15 @@ class SQLiteDatabase {
 	
 	_openConnection(filePath, onCreateExecuteCallback) {
 		
-		const db = new Database(filePath);
+		function initDb() {
+			return new Database(filePath);
+		}
+		
+		let db = undefined;
 		
 		try {
 			if (onCreateExecuteCallback && !this.db && !fs.existsSync(filePath)) {
+				db = initDb();
 				this.execute(onCreateExecuteCallback, db);
 			}
 		}
@@ -27,7 +32,7 @@ class SQLiteDatabase {
 			console.error(err);
 		}
 		
-		return db;
+		return db || initDb();
 		
 	}
 	
