@@ -46,19 +46,21 @@ class SQLiteDatabase {
 			throw "Callback parameter is required for this function to run.";
 		}
 		
-		if (!this.db) {
-			this.db = this._openConnection(this._filePath);
-		}
+		const db = this.db || this._openConnection(this._filePath);
 		
-		callback(this.db);
+		callback(db);
 		
-		this.close();
+		this.close(db);
 		
 	}
 	
-	close() {
+	close(db) {
 		
 		clearTimeout(this._timeout);
+		
+		if (!db) {
+			db = this.db;
+		}
 		
 		if (this.db) {
 			
