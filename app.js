@@ -1,7 +1,7 @@
 const { SQLiteDatabase } = require('./database');
 
 const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`, db => {
-	db.prepare("CREATE TABLE elections(id TEXT PRIMARY KEY, numberOfJoined INTEGER DEFAULT 0, lastUsed DATE DEFAULT (datetime('now','localtime')), data TEXT NOT NULL, picture TEXT)").run();
+	db.prepare("CREATE TABLE elections(id TEXT PRIMARY KEY, numberOfJoined INTEGER DEFAULT 0, lastUsed DATE DEFAULT (datetime('now','localtime')), numberOfDownload INTEGER DEFAULT 0, data TEXT NOT NULL, picture TEXT)").run();
 });
 
 function createCode(length) {
@@ -102,6 +102,10 @@ class ElectionController {
 		const row = db.prepare("SELECT * FROM elections WHERE id = ?").get(code);
 		
 		if (row) {
+			
+			if (req.method != "DELETE") {
+				db.prepare("UPDATE elections SET numberOfDownload = numberOfDownload + 1, lastUsed = (datetime('now','localtime')) WHERE id = ?").run(code);
+			}
 			
 			const electionData = JSON.parse(row.data);
 			
