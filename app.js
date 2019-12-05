@@ -1,7 +1,7 @@
 const { SQLiteDatabase } = require('./database');
 
 const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`, db => {
-	db.run('CREATE TABLE elections(id text PRIMARY KEY, data text NOT NULL, picture text, numberOfJoined DEFAULT 0)');
+	db.prepare("CREATE TABLE elections(id TEXT PRIMARY KEY, numberOfJoined INTEGER DEFAULT 0, lastUsed DATE DEFAULT (datetime('now','localtime')), data TEXT NOT NULL, picture TEXT)").run();
 });
 
 function createCode(length) {
@@ -41,18 +41,12 @@ class ElectionController {
 				
 				const sqlGetRowQuery = "SELECT id FROM elections WHERE id = ?";
 				
-				db.get(sqlGetRowQuery, [code], (err, row) => {
-					
-					if (err) {
-						return console.error(err);
-					}
-					
-					// If a row is present, code is invalid
-					if (row) {
-						code = undefined;
-					}
-					
-				});
+				const row = db.prepare(sqlGetRowQuery).get(code);
+				
+				// If row present, code is invalid
+				if (row) {
+					code = undefined;
+				}
 				
 			} while (!code);
 			
@@ -63,7 +57,7 @@ class ElectionController {
 			
 			const dbJsonData = JSON.stringify(jsonData);
 			
-			db.run(`INSERT INTO elections(id, data, picture) VALUES(?, ?, ?)`, [code, dbJsonData, pictureData]);
+			db.prepare("INSERT INTO elections(id, data, picture) VALUES(?, ?, ?)").run(code, dbJsonData, pictureData);
 			
 			res.json({ code: code, data: jsonData });
 			

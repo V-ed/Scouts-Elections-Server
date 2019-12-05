@@ -1,5 +1,5 @@
 const fs = require('fs');
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 
 class SQLiteDatabase {
 	
@@ -16,16 +16,12 @@ class SQLiteDatabase {
 			console.error(err);
 		}
 		
+		process.on('exit', () => this.close());
+		
 	}
 	
 	_openConnection(filePath) {
-		
-		return new sqlite3.Database(filePath, err => {
-			if (err) {
-				console.error(err.message);
-			}
-		});
-		
+		return new Database(filePath);
 	}
 	
 	get() {
@@ -66,12 +62,7 @@ class SQLiteDatabase {
 		
 		if (this.db) {
 			
-			this.db.close(err => {
-				if (err) {
-					console.error(err.message);
-				}
-			});
-			
+			this.db.close();
 			this.db = undefined;
 			
 		}
