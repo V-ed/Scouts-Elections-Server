@@ -77,6 +77,33 @@ class ElectionController {
 		res.json({ code: req.params.electionCode });
 	}
 	
+	static delete(req, res) {
+		
+		const code = req.params.electionCode;
+		
+		const db = dbWrapper.get();
+		
+		
+		const row = db.prepare("SELECT * FROM elections WHERE id = ?").get(code);
+		
+		if (row) {
+			
+			const electionData = JSON.parse(row.data);
+			
+			electionData.groupImage = row.picture;
+			
+			db.prepare("DELETE FROM elections WHERE id = ?").run(code);
+			
+			res.json({ code: code, data: electionData });
+			
+		}
+		else {
+			res.status(400);
+			res.send(`No election with code ${code} found!`);
+		}
+		
+	}
+	
 }
 
 module.exports = {

@@ -7,10 +7,12 @@ exports.setup = (app, route) => {
 	
 	app.post(route('/create'), upload.none(), ElectionController.create);
 	
-	app.get(route('/:electionCode/join'), ElectionController.join);
+	app.get(route('/:electionCode([A-Z1-9]{6})/join'), ElectionController.join);
 	
-	app.put(route('/:electionCode/vote'), upload.none(), ElectionController.vote);
+	app.put(route('/:electionCode([A-Z1-9]{6})/vote'), upload.none(), ElectionController.vote);
 	
-	app.get(route('/:electionCode/retrieve'), ElectionController.retrieve);
+	app.get(route('/:electionCode([A-Z1-9]{6})/retrieve'), ElectionController.retrieve);
+	
+	app.delete(route('/:electionCode([A-Z1-9]{6})/delete'), ElectionController.delete);
 	
 }
