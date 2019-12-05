@@ -94,15 +94,10 @@ class ElectionController {
 	}
 	
 	static retrieve(req, res) {
-		res.json({ code: req.params.electionCode });
-	}
-	
-	static delete(req, res) {
 		
 		const code = req.params.electionCode;
 		
 		const db = dbWrapper.get();
-		
 		
 		const row = db.prepare("SELECT * FROM elections WHERE id = ?").get(code);
 		
@@ -112,14 +107,30 @@ class ElectionController {
 			
 			electionData.groupImage = row.picture;
 			
-			db.prepare("DELETE FROM elections WHERE id = ?").run(code);
-			
 			res.json({ code: code, data: electionData });
+			
+			return true;
 			
 		}
 		else {
+			
 			res.status(400);
 			res.send(`No election with code ${code} found!`);
+			
+			return false;
+			
+		}
+		
+	}
+	
+	static delete(req, res) {
+		
+		const hasRetrieved = ElectionController.retrieve(req, res);
+		
+		if (hasRetrieved) {
+			
+			dbWrapper.get().prepare("DELETE FROM elections WHERE id = ?").run(req.params.electionCode);
+			
 		}
 		
 	}
