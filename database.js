@@ -8,9 +8,18 @@ class SQLiteDatabase {
 		this._filePath = filePath;
 		this._onCreateExecuteCallback = onCreateExecuteCallback;
 		
-		this._openConnection(filePath, onCreateExecuteCallback).close();
+		const db = this._openConnection(filePath, onCreateExecuteCallback);
+		
+		this.isOpen = !!db;
+		
+		if (db) {
+			db.close();
+		}
 		
 		process.on('exit', () => this.close());
+		process.on('SIGHUP', () => process.exit(128 + 1));
+		process.on('SIGINT', () => process.exit(128 + 2));
+		process.on('SIGTERM', () => process.exit(128 + 15));
 		
 	}
 	
@@ -23,10 +32,19 @@ class SQLiteDatabase {
 		let db = undefined;
 		
 		try {
-			if (onCreateExecuteCallback && !this.db && !fs.existsSync(filePath)) {
-				db = initDb();
-				this.execute(onCreateExecuteCallback, db);
+			
+			if (!this.db) {
+				
+				if (onCreateExecuteCallback === false && !fs.existsSync(filePath)) {
+					return false;
+				}
+				else if (onCreateExecuteCallback && !fs.existsSync(filePath)) {
+					db = initDb();
+					this.execute(onCreateExecuteCallback, db);
+				}
+				
 			}
+			
 		}
 		catch (err) {
 			console.error(err);
