@@ -90,7 +90,57 @@ class ElectionController {
 	}
 	
 	static vote(req, res) {
-		res.json({ code: req.params.electionCode });
+		
+		const formData = req.body;
+		
+		if (!formData) {
+			// No data given in multipart form, send missing data error.
+			res.status(400);
+			res.send('No data given!');
+			
+		}
+		else {
+			
+			const code = req.params.electionCode;
+			
+			const db = dbWrapper.get();
+			
+			const row = db.prepare("SELECT data FROM elections WHERE id = ?").get(code);
+			
+			if (row) {
+				
+				const electionData = JSON.parse(row.data);
+				
+				let votersArray = JSON.parse(formData.data);
+				
+				for (let i = 0; i < votersArray.length; i++) {
+					
+					const voterIndex = votersArray[i];
+					
+					electionData.candidates[voterIndex].voteCount++;
+					
+				}
+				
+				electionData.numberOfVoted++;
+				
+				const stringifiedData = JSON.stringify(electionData);
+				
+				db.prepare("UPDATE elections SET lastUsed = (datetime('now','localtime')), data = ? WHERE id = ?").run(stringifiedData, code);
+				
+				res.json({ data: electionData });
+				
+			}
+			else {
+				
+				res.status(400);
+				res.send(`No election with code ${code} found!`);
+				
+				return false;
+				
+			}
+			
+		}
+		
 	}
 	
 	static retrieve(req, res) {
