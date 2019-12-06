@@ -169,8 +169,6 @@ class ElectionController {
 			res.status(400);
 			res.send(`No election with code ${code} found!`);
 			
-			return false;
-			
 		}
 		
 	}
