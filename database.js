@@ -94,10 +94,13 @@ class SQLiteDatabase {
 			db = this.db;
 		}
 		
-		if (this.db) {
+		if (db) {
 			
-			this.db.close();
-			this.db = undefined;
+			db.close();
+			
+			if (this.db) {
+				this.db = undefined;
+			}
 			
 		}
 		
