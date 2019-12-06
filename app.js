@@ -143,6 +143,38 @@ class ElectionController {
 		
 	}
 	
+	static skip(req, res) {
+		
+		const code = req.params.electionCode;
+		
+		const db = dbWrapper.get();
+		
+		const row = db.prepare("SELECT data FROM elections WHERE id = ?").get(code);
+		
+		if (row) {
+			
+			const electionData = JSON.parse(row.data);
+			
+			electionData.hasSkipped = true;
+			
+			const stringifiedData = JSON.stringify(electionData);
+			
+			db.prepare("UPDATE elections SET lastUsed = (datetime('now','localtime')), data = ? WHERE id = ?").run(stringifiedData, code);
+			
+			res.json({ data: electionData });
+			
+		}
+		else {
+			
+			res.status(400);
+			res.send(`No election with code ${code} found!`);
+			
+			return false;
+			
+		}
+		
+	}
+	
 	static retrieve(req, res) {
 		
 		const code = req.params.electionCode;

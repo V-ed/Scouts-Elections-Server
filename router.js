@@ -11,6 +11,8 @@ exports.setup = (app, route) => {
 	
 	app.put(route('/:electionCode([A-Z1-9]{6})/vote'), upload.none(), ElectionController.vote);
 	
+	app.put(route('/:electionCode([A-Z1-9]{6})/skip'), ElectionController.skip);
+	
 	app.get(route('/:electionCode([A-Z1-9]{6})/retrieve'), ElectionController.retrieve);
 	
 	app.delete(route('/:electionCode([A-Z1-9]{6})/delete'), ElectionController.delete);
