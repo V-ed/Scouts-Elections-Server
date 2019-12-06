@@ -1,7 +1,7 @@
 const { SQLiteDatabase } = require('./database');
 
 const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`, db => {
-	db.prepare("CREATE TABLE elections(id TEXT PRIMARY KEY, numberOfJoined INTEGER DEFAULT 0, lastUsed DATE DEFAULT (datetime('now','localtime')), numberOfDownload INTEGER DEFAULT 0, data TEXT NOT NULL, picture TEXT)").run();
+	db.prepare("CREATE TABLE elections(id TEXT PRIMARY KEY, numberOfJoined INTEGER DEFAULT 0, lastUsed DATE DEFAULT (datetime('now', 'localtime')), numberOfDownload INTEGER DEFAULT 0, data TEXT NOT NULL, picture TEXT)").run();
 });
 
 function createCode(length) {
@@ -13,6 +13,7 @@ function createCode(length) {
 	for (let i = 0; i < length; i++) {
 		result += characters.charAt(Math.floor(Math.random() * charactersLength));
 	}
+	
 	return result;
 	
 }
@@ -73,7 +74,7 @@ class ElectionController {
 		
 		if (row) {
 			
-			db.prepare("UPDATE elections SET numberOfJoined = numberOfJoined + 1, lastUsed = (datetime('now','localtime')) WHERE id = ?").run(code);
+			db.prepare("UPDATE elections SET numberOfJoined = numberOfJoined + 1, lastUsed = (datetime('now', 'localtime')) WHERE id = ?").run(code);
 			
 			const electionData = JSON.parse(row.data);
 			
@@ -125,7 +126,7 @@ class ElectionController {
 				
 				const stringifiedData = JSON.stringify(electionData);
 				
-				db.prepare("UPDATE elections SET lastUsed = (datetime('now','localtime')), data = ? WHERE id = ?").run(stringifiedData, code);
+				db.prepare("UPDATE elections SET lastUsed = (datetime('now', 'localtime')), data = ? WHERE id = ?").run(stringifiedData, code);
 				
 				res.json({ data: electionData });
 				
@@ -159,7 +160,7 @@ class ElectionController {
 			
 			const stringifiedData = JSON.stringify(electionData);
 			
-			db.prepare("UPDATE elections SET lastUsed = (datetime('now','localtime')), data = ? WHERE id = ?").run(stringifiedData, code);
+			db.prepare("UPDATE elections SET lastUsed = (datetime('now', 'localtime')), data = ? WHERE id = ?").run(stringifiedData, code);
 			
 			res.json({ data: electionData });
 			
@@ -184,7 +185,7 @@ class ElectionController {
 		if (row) {
 			
 			if (req.method != "DELETE") {
-				db.prepare("UPDATE elections SET numberOfDownload = numberOfDownload + 1, lastUsed = (datetime('now','localtime')) WHERE id = ?").run(code);
+				db.prepare("UPDATE elections SET numberOfDownload = numberOfDownload + 1, lastUsed = (datetime('now', 'localtime')) WHERE id = ?").run(code);
 			}
 			
 			const electionData = JSON.parse(row.data);
