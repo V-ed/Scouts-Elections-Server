@@ -1,12 +1,15 @@
 const multer = require('multer');
 const { ElectionController } = require('./app');
-const cors = require('cors')
+const cors = require('cors');
+const express = require('express');
 
 const upload = multer();
 
 exports.setup = (app, route) => {
 	
-	app.post(route('/create'), upload.none(), cors(), ElectionController.create);
+	app.post(route('/create'), express.json(), cors(), ElectionController.create);
+	
+	app.options(route('/*'), cors());
 	
 	app.get(route('/:electionCode([A-Z1-9]{6})/join'), cors(), ElectionController.join);
 	

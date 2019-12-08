@@ -1,6 +1,7 @@
 const { SQLiteDatabase } = require('./database');
 
 const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`, db => {
+	db.pragma("encoding = 'UTF-16'");
 	db.prepare("CREATE TABLE elections(id TEXT PRIMARY KEY, numberOfJoined INTEGER DEFAULT 0, lastUsed DATE DEFAULT (datetime('now', 'localtime')), numberOfDownload INTEGER DEFAULT 0, data TEXT NOT NULL, picture TEXT)").run();
 });
 
@@ -49,16 +50,14 @@ class ElectionController {
 				
 			} while (!code);
 			
-			let jsonData = JSON.parse(formData.data);
+			const pictureData = formData.groupImage;
+			delete formData.groupImage;
 			
-			const pictureData = jsonData.groupImage;
-			delete jsonData.groupImage;
+			const jsonData = JSON.stringify(formData);
 			
-			const dbJsonData = JSON.stringify(jsonData);
+			db.prepare("INSERT INTO elections(id, data, picture) VALUES(?, ?, ?)").run(code, jsonData, pictureData);
 			
-			db.prepare("INSERT INTO elections(id, data, picture) VALUES(?, ?, ?)").run(code, dbJsonData, pictureData);
-			
-			res.json({ code: code, data: jsonData });
+			res.json({ code: code, data: formData });
 			
 		}
 		
