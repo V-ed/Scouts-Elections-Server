@@ -7,7 +7,7 @@ const upload = multer();
 
 exports.setup = (app, route) => {
 	
-	app.post(route('/create'), express.json(), cors(), ElectionController.create);
+	app.post(route('/create'), express.json({ limit: '3mb' }), cors(), ElectionController.create);
 	
 	app.options(route('/*'), cors());
 	
