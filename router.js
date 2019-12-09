@@ -1,9 +1,6 @@
-const multer = require('multer');
 const { ElectionController } = require('./app');
 const cors = require('cors');
 const express = require('express');
-
-const upload = multer();
 
 exports.setup = (app, route) => {
 	
