@@ -111,7 +111,7 @@ class ElectionController {
 				
 				const electionData = JSON.parse(row.data);
 				
-				let votersArray = JSON.parse(formData.data);
+				let votersArray = JSON.parse(formData);
 				
 				for (let i = 0; i < votersArray.length; i++) {
 					
@@ -134,8 +134,6 @@ class ElectionController {
 				
 				res.status(400);
 				res.send(`No election with code ${code} found!`);
-				
-				return false;
 				
 			}
 			

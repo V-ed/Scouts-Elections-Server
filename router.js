@@ -13,7 +13,7 @@ exports.setup = (app, route) => {
 	
 	app.get(route('/:electionCode([A-Z1-9]{6})/join'), cors(), ElectionController.join);
 	
-	app.put(route('/:electionCode([A-Z1-9]{6})/vote'), upload.none(), cors(), ElectionController.vote);
+	app.put(route('/:electionCode([A-Z1-9]{6})/vote'), express.json({ limit: '10kb' }), cors(), ElectionController.vote);
 	
 	app.put(route('/:electionCode([A-Z1-9]{6})/skip'), cors(), ElectionController.skip);
 	
