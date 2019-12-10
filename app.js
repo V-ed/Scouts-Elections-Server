@@ -111,7 +111,7 @@ class ElectionController {
 				
 				const electionData = JSON.parse(row.data);
 				
-				let votersArray = JSON.parse(formData);
+				let votersArray = formData;
 				
 				for (let i = 0; i < votersArray.length; i++) {
 					
