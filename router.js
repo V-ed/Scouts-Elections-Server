@@ -12,6 +12,8 @@ exports.setup = (app, route) => {
 	
 	app.put(route('/:electionCode([A-Z1-9]{6})/vote'), express.json({ limit: '10kb' }), cors(), ElectionController.vote);
 	
+	app.get(route('/:electionCode([A-Z1-9]{6})/seat'), cors(), ElectionController.takeSeat);
+	
 	app.put(route('/:electionCode([A-Z1-9]{6})/skip'), cors(), ElectionController.skip);
 	
 	app.get(route('/:electionCode([A-Z1-9]{6})/retrieve'), cors(), ElectionController.retrieve);
