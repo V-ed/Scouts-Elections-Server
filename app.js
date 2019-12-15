@@ -153,7 +153,7 @@ class ElectionController {
 			
 			const electionData = JSON.parse(row.data);
 			
-			electionData.numberOfSeatsTaken++;
+			electionData.numberOfSeatsTaken = electionData.numberOfSeatsTaken ? electionData.numberOfSeatsTaken + 1 : 1;
 			
 			const stringifiedData = JSON.stringify(electionData);
 			
@@ -201,7 +201,7 @@ class ElectionController {
 		
 	}
 	
-	static retrieve(req, res) {
+	static retrieve(req, res, isForDeletion) {
 		
 		const code = req.params.electionCode;
 		
@@ -211,15 +211,30 @@ class ElectionController {
 		
 		if (row) {
 			
-			if (req.method != "DELETE") {
-				db.prepare("UPDATE elections SET numberOfDownload = numberOfDownload + 1, lastUsed = (datetime('now', 'localtime')) WHERE id = ?").run(code);
+			if (!isForDeletion) {
+				db.prepare("UPDATE elections SET lastUsed = (datetime('now', 'localtime')) WHERE id = ?").run(code);
 			}
 			
 			const electionData = JSON.parse(row.data);
 			
 			electionData.groupImage = row.picture;
 			
-			res.json({ code: code, data: electionData });
+			const queryKeys = Object.keys(req.query);
+			
+			let finalData = undefined;
+			
+			if (queryKeys.length > 0) {
+				
+				finalData = {};
+				
+				queryKeys.forEach(queryKey => finalData[queryKey] = electionData[queryKey]);
+				
+			}
+			else {
+				finalData = electionData;
+			}
+			
+			res.json({ code: code, data: finalData });
 			
 			return true;
 			
@@ -237,7 +252,7 @@ class ElectionController {
 	
 	static delete(req, res) {
 		
-		const hasRetrieved = ElectionController.retrieve(req, res);
+		const hasRetrieved = ElectionController.retrieve(req, res, true);
 		
 		if (hasRetrieved) {
 			
