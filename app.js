@@ -106,7 +106,7 @@ class ElectionController {
 		
 		const code = req.params.electionCode;
 		
-		const row = db.prepare("SELECT elections.data, photos.data AS photo_data FROM elections LEFT JOIN photos ON elections.photo_id = photos.id WHERE id = ?").get(code);
+		const row = db.prepare("SELECT elections.data, photos.data AS photo_data FROM elections LEFT JOIN photos ON elections.photo_id = photos.id WHERE elections.id = ?").get(code);
 		
 		if (row) {
 			
@@ -244,13 +244,15 @@ class ElectionController {
 		
 		const db = dbWrapper.get();
 		
-		const query = req.query.groupImage ? "SELECT elections.data, photos.data AS photo_data FROM elections LEFT JOIN photos ON elections.photo_id = photos.id WHERE id = ?" : "SELECT data FROM elections WHERE id = ?";
+		const hasRequestedImage = "groupImage" in req.query;
+		
+		const query = hasRequestedImage ? "SELECT elections.data, photos.data AS photo_data FROM elections LEFT JOIN photos ON elections.photo_id = photos.id WHERE elections.id = ?" : "SELECT data FROM elections WHERE id = ?";
 		
 		const row = db.prepare(query).get(code);
 		
 		if (row) {
 			
-			if (!isForDeletion) {
+			if (isForDeletion !== true) {
 				db.prepare("UPDATE elections SET last_used = (datetime('now', 'localtime')) WHERE id = ?").run(code);
 			}
 			
@@ -266,7 +268,7 @@ class ElectionController {
 				
 				queryKeys.forEach(queryKey => finalData[queryKey] = electionData[queryKey]);
 				// Also manually add photo if requested
-				if (req.query.groupImage) {
+				if (hasRequestedImage) {
 					finalData.groupImage = row.photo_data;
 				}
 				
