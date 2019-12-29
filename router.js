@@ -4,7 +4,10 @@ const express = require('express');
 
 exports.setup = (app, route) => {
 	
+	app.options(route('/'), cors());
 	app.options(route('/*'), cors());
+	
+	app.get(route('/'), cors(), ElectionController.home);
 	
 	app.post(route('/create'), express.json({ limit: '3mb' }), cors(), ElectionController.create);
 	

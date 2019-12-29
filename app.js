@@ -42,6 +42,13 @@ function createCode(length) {
 
 class ElectionController {
 	
+	static home(req, res) {
+		
+		res.status(200);
+		res.send('This is the Scouts Elections API!');
+		
+	}
+	
 	static create(req, res) {
 		
 		const formData = req.body;
