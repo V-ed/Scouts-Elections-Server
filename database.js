@@ -5,6 +5,9 @@ class SQLiteDatabase {
 	
 	constructor(filePath, onCreateExecuteCallback) {
 		
+		// Math below is the total milliseconds for an hour
+		this.timeout = 1 * 1000 * 60 * 60;
+		
 		this._filePath = filePath;
 		this._onCreateExecuteCallback = onCreateExecuteCallback;
 		
@@ -60,11 +63,10 @@ class SQLiteDatabase {
 			this.db = this._openConnection(this._filePath, this._onCreateExecuteCallback);
 		}
 		
-		clearTimeout(this._timeout);
-		this._timeout = setTimeout(() => {
+		clearTimeout(this._closingTimeout);
+		this._closingTimeout = setTimeout(() => {
 			this.close();
-		}, 1 * 1000 * 60 * 60);
-		// Above math is the total milliseconds for an hour
+		}, this.timeout);
 		
 		return this.db;
 		
@@ -88,7 +90,7 @@ class SQLiteDatabase {
 	
 	close(db) {
 		
-		clearTimeout(this._timeout);
+		clearTimeout(this._closingTimeout);
 		
 		if (!db) {
 			db = this.db;
