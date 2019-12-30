@@ -13,8 +13,8 @@
 			],
 			"preLaunchTask": "Activate Server Debug",
 			"postDebugTask": "Deactivate Server Debug",
-            "restart": true,
-            "protocol": "inspector"
+			"restart": true,
+			"protocol": "inspector"
 		}
 	]
 }
