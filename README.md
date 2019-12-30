@@ -13,7 +13,7 @@ This means that whenever the debug in vscode starts, my server turns into a debu
 
 - Guillaume Marcoux ([V-ed](https://github.com/V-ed)) - Owner
 
-See also the list of [contributors](https://github.com/V-ed/jrequester/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/V-ed/Scouts-Elections-Server/contributors) who participated in this project.
 
 ## License
 
