@@ -1,4 +1,5 @@
 const { ElectionController } = require('./app');
+const { sync } = require('./queuer');
 const cors = require('cors');
 const express = require('express');
 
@@ -9,18 +10,18 @@ exports.setup = (app, route) => {
 	
 	app.get(route('/'), cors(), ElectionController.home);
 	
-	app.post(route('/create'), express.json({ limit: '3mb' }), cors(), ElectionController.create);
+	app.post(route('/create'), express.json({ limit: '3mb' }), cors(), sync(), ElectionController.create);
 	
-	app.get(route('/join/:electionCode([A-Z1-9]{6})'), cors(), ElectionController.join);
+	app.get(route('/join/:electionCode([A-Z1-9]{6})'), cors(), sync(), ElectionController.join);
 	
-	app.put(route('/vote/:electionCode([A-Z1-9]{6})'), express.json({ limit: '10kb' }), cors(), ElectionController.vote);
+	app.put(route('/vote/:electionCode([A-Z1-9]{6})'), express.json({ limit: '10kb' }), cors(), sync(), ElectionController.vote);
 	
-	app.get(route('/seat/:electionCode([A-Z1-9]{6})'), cors(), ElectionController.takeSeat);
+	app.get(route('/seat/:electionCode([A-Z1-9]{6})'), cors(), sync(), ElectionController.takeSeat);
 	
-	app.put(route('/skip/:electionCode([A-Z1-9]{6})'), cors(), ElectionController.skip);
+	app.put(route('/skip/:electionCode([A-Z1-9]{6})'), cors(), sync(), ElectionController.skip);
 	
-	app.get(route('/retrieve/:electionCode([A-Z1-9]{6})'), cors(), ElectionController.retrieve);
+	app.get(route('/retrieve/:electionCode([A-Z1-9]{6})'), cors(), sync(), ElectionController.retrieve);
 	
-	app.delete(route('/delete/:electionCode([A-Z1-9]{6})'), cors(), ElectionController.delete);
+	app.delete(route('/delete/:electionCode([A-Z1-9]{6})'), cors(), sync(), ElectionController.delete);
 	
 }
