@@ -273,14 +273,19 @@ class ElectionController {
 				
 				finalData = {};
 				
-				queryKeys.forEach(queryKey => finalData[queryKey] = electionData[queryKey]);
+				queryKeys.forEach(queryKey => {
+					if (electionData[queryKey]) {
+						finalData[queryKey] = electionData[queryKey];
+					}
+				});
 				// Also manually add photo if requested
 				if (hasRequestedImage) {
 					finalData.groupImage = row.photo_data;
 				}
 				
 			}
-			else {
+			
+			if (!finalData || (Object.keys(finalData).length === 0 && finalData.constructor === Object)) {
 				finalData = electionData;
 			}
 			
