@@ -29,7 +29,7 @@ const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`, db => {
 function createCode(length) {
 	
 	let result = '';
-	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+	const characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
 	const charactersLength = characters.length;
 	
 	for (let i = 0; i < length; i++) {
