@@ -6,13 +6,13 @@
 	"configurations": [
 		{
 			"type": "node",
-			"request": "attach",
-			"name": "Attach to Nodemon Server",
+			"request": "launch",
+			"name": "Launch Nodemon Server",
 			"skipFiles": [
 				"<node_internals>/**"
 			],
-			"preLaunchTask": "Activate Server Debug",
-			"postDebugTask": "Deactivate Server Debug",
+			"runtimeExecutable": "nodemon",
+			"program": "${workspaceFolder}/debug/debugger.js",
 			"restart": true,
 			"protocol": "inspector"
 		}
