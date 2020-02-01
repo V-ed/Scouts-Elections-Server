@@ -1,6 +1,8 @@
 const { SQLiteDatabase } = require('./database');
 
-const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`, db => {
+const dbPath = process.env.NODE_ENV == 'prod' ? 'db/elections.db' : `debug/db/elections${process.env.NODE_ENV ? '_' + process.env.NODE_ENV : ''}.db`;
+
+const dbWrapper = new SQLiteDatabase(`${__dirname}/${dbPath}`, db => {
 	db.pragma("encoding = 'UTF-16'");
 	db.pragma("auto_vacuum = FULL");
 	db.pragma("foreign_keys = ON");
