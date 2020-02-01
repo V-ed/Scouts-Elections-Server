@@ -15,7 +15,7 @@ scoutElectionModule.setup(app, router);
 
 // All other routes will lead to a 404 Not Found error
 app.use(function(req, res) {
-    res.status(404).end();
+	res.status(404).end();
 });
 
 app.listen(PORT_HTTP, () => {
