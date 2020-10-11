@@ -14,11 +14,6 @@
 		"node": true,
 		"commonjs": true
 	},
-	"globals": {
-		"LZString": "readonly",
-		"saveAs": "readonly",
-		"ClipboardJS": "readonly"
-	},
 	"rules": {
 		"no-trailing-spaces": ["error", { "skipBlankLines": true }],
 		"semi": ["error", "always"],
