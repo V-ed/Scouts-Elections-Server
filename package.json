@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "precommit-lint": "eslint . || (echo '\\e[1;31mCannot commit : Please fix above ESLint issues first!\\e[m' && exit 1)",
+    "precommit-lint": "npm run lint || (echo '\\e[1;31mCannot commit : Please fix above ESLint issues first!\\e[m' && exit 1)",
     "precommit-checklint-msg": "echo 'Checking code lint...' && exit 0",
     "precommit-checklint-msg-success": "echo 'Code lint OK!' && exit 0"
   },
