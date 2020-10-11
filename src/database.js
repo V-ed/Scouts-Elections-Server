@@ -1,8 +1,12 @@
-const fs = require('fs');
-const Database = require('better-sqlite3');
+import fs from 'fs';
+import DatabaseConstructor from 'better-sqlite3';
 
-class SQLiteDatabase {
+export class SQLiteDatabase {
 	
+	/**
+	 * @param {string} filePath
+	 * @param {false | ((db: import('better-sqlite3').Database) => *)} [onCreateExecuteCallback]
+	 */
 	constructor(filePath, onCreateExecuteCallback) {
 		
 		// Math below is the total milliseconds for an hour
@@ -26,12 +30,17 @@ class SQLiteDatabase {
 		
 	}
 	
+	/**
+	 * @param {string} filePath
+	 * @param {false | ((db: import('better-sqlite3').Database) => *)} [onCreateExecuteCallback]
+	 */
 	_openConnection(filePath, onCreateExecuteCallback) {
 		
 		function initDb() {
-			return new Database(filePath);
+			return new DatabaseConstructor(filePath);
 		}
 		
+		/** @type { import('better-sqlite3').Database } */
 		let db = undefined;
 		
 		try {
@@ -39,7 +48,7 @@ class SQLiteDatabase {
 			if (!this.db) {
 				
 				if (onCreateExecuteCallback === false && !fs.existsSync(filePath)) {
-					return false;
+					return;
 				}
 				else if (onCreateExecuteCallback && !fs.existsSync(filePath)) {
 					db = initDb();
@@ -72,6 +81,11 @@ class SQLiteDatabase {
 		
 	}
 	
+	/**
+	 * 
+	 * @param {(db: import('better-sqlite3').Database) => *} callback 
+	 * @param {import('better-sqlite3').Database} [database] 
+	 */
 	execute(callback, database) {
 		
 		if (!callback) {
@@ -88,6 +102,10 @@ class SQLiteDatabase {
 		
 	}
 	
+	/**
+	 * 
+	 * @param {import('better-sqlite3').Database} [db] 
+	 */
 	close(db) {
 		
 		clearTimeout(this._closingTimeout);
@@ -110,6 +128,4 @@ class SQLiteDatabase {
 	
 }
 
-module.exports = {
-	SQLiteDatabase: SQLiteDatabase
-};
+export default SQLiteDatabase;

@@ -1,9 +1,13 @@
-const { ElectionController } = require('./app');
-const { sync } = require('./queuer');
-const cors = require('cors');
-const express = require('express');
+import { ElectionController } from './app.js';
+import { sync } from './queuer.js';
+import cors from 'cors';
+import express from 'express';
 
-exports.setup = (app, route) => {
+/**
+ * @param {import("express").Express} app
+ * @param {{ (path: string): string; (arg0: string): any; }} route
+ */
+export function setup(app, route) {
 	
 	app.options(route('/'), cors());
 	app.options(route('/*'), cors());

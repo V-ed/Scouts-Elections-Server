@@ -1,6 +1,7 @@
-const { SQLiteDatabase } = require('./database');
+import { SQLiteDatabase } from './database.js';
+import { __dirname } from "./variables.js";
 
-const dbPath = process.env.NODE_ENV == 'prod' ? 'db/elections.db' : `debug/db/elections${process.env.NODE_ENV ? '_' + process.env.NODE_ENV : ''}.db`;
+const dbPath = process.env.NODE_ENV == 'prod' ? '../db/elections.db' : `../debug/db/elections${process.env.NODE_ENV ? '_' + process.env.NODE_ENV : ''}.db`;
 
 const dbWrapper = new SQLiteDatabase(`${__dirname}/${dbPath}`, db => {
 	db.pragma("encoding = 'UTF-16'");
@@ -28,6 +29,9 @@ const dbWrapper = new SQLiteDatabase(`${__dirname}/${dbPath}`, db => {
 	`).run();
 });
 
+/**
+ * @param {number} length
+ */
 function createCode(length) {
 	
 	let result = '';
@@ -42,7 +46,7 @@ function createCode(length) {
 	
 }
 
-class ElectionController {
+export class ElectionController {
 	
 	static home(req, res) {
 		
@@ -63,6 +67,7 @@ class ElectionController {
 		}
 		else {
 			
+			/** @type {string} */
 			let code;
 			
 			const db = dbWrapper.get();
@@ -269,6 +274,7 @@ class ElectionController {
 			
 			const queryKeys = Object.keys(req.query);
 			
+			/** @type {Record<string, *>} */
 			let finalData = undefined;
 			
 			if (queryKeys.length > 0) {
@@ -321,6 +327,4 @@ class ElectionController {
 	
 }
 
-module.exports = {
-	ElectionController: ElectionController
-};
+export default ElectionController;

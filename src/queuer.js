@@ -1,8 +1,8 @@
-const Queue = require('sync-queue');
+import Queue from 'sync-queue';
 
 const queue = new Queue();
 
-function sync() {
+export function sync() {
 
 	return (_req, _res, next) => {
 		
@@ -18,6 +18,4 @@ function sync() {
 
 }
 
-module.exports = {
-	sync: sync
-};
+export default sync;

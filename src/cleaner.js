@@ -1,4 +1,4 @@
-const { SQLiteDatabase } = require('./database');
+import { SQLiteDatabase } from './database.js';
 
 const dbWrapper = new SQLiteDatabase(`${__dirname}/db/elections.db`, false);
 
