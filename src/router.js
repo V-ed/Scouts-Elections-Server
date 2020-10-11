@@ -2,12 +2,15 @@ import { ElectionController } from './app.js';
 import { sync } from './queuer.js';
 import cors from 'cors';
 import express from 'express';
+import startCleanerCron from './cleaner.js';
 
 /**
  * @param {import("express").Express} app
  * @param {{ (path: string): string; (arg0: string): any; }} route
  */
 export function setup(app, route) {
+    startCleanerCron();
+    
     app.options(route('/'), cors());
     app.options(route('/*'), cors());
     
