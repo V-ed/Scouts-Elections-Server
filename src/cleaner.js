@@ -1,5 +1,7 @@
 import { SQLiteDatabase } from './database.js';
-import { CronJob } from 'cron';
+import cron from 'cron';
+
+const { CronJob } = cron;
 
 const job = new CronJob(
     '0 * * * *',
