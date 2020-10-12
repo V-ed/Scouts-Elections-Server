@@ -20,6 +20,8 @@ export function setup(app, route) {
     
     app.get(route('/join/:electionCode([A-NP-Z1-9]{6})'), cors(), sync(), ElectionController.join);
     
+    app.get(route('/join-virtual/:electionCode([A-NP-Z1-9]{6})'), cors(), sync(), ElectionController.joinVirtual);
+    
     app.put(route('/vote/:electionCode([A-NP-Z1-9]{6})'), express.json({ limit: '10kb' }), cors(), sync(), ElectionController.vote);
     
     app.get(route('/seat/:electionCode([A-NP-Z1-9]{6})'), cors(), sync(), ElectionController.takeSeat);

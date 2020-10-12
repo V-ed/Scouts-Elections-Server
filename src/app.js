@@ -121,6 +121,10 @@ export class ElectionController {
         }
     }
     
+    static joinVirtual(req, res) {
+        ElectionController.join(req, res);
+    }
+    
     static vote(req, res) {
         const formData = req.body;
         
