@@ -34,5 +34,9 @@ export function setup(app, route) {
     
     app.get(route('/retrieve/:electionCode([A-NP-Z1-9]{6})'), cors(), sync(), ElectionController.retrieve);
     
+    app.get(route('/retrieve-virtual/:electionCode([A-NP-Z1-9]{6})'), cors(), sync(), ElectionController.retrieveVirtual);
+    
+    app.put(route('/update-candidate/:electionCode([A-NP-Z1-9]{6})'), cors(), express.json({ limit: '10kb' }), sync(), ElectionController.updateCandidateState);
+    
     app.delete(route('/delete/:electionCode([A-NP-Z1-9]{6})'), cors(), sync(), ElectionController.delete);
 }

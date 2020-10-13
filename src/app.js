@@ -193,7 +193,16 @@ export class ElectionController {
             
             electionData.groupImage = row.photo_data;
             
-            res.json({ code: code, data: electionData });
+            const returnValue = {
+                code: code,
+                isElectionFinished: electionData.numberOfVoted == electionData.numberOfVoters
+            };
+            
+            if (!returnValue.isElectionFinished || 'admin' in req.query) {
+                returnValue.data = electionData;
+            }
+            
+            res.json(returnValue);
         } else {
             res.status(400);
             res.send(`No election with code ${code} found!`);
@@ -325,7 +334,9 @@ export class ElectionController {
         
         const hasRequestedImage = 'groupImage' in req.query;
         
-        const query = hasRequestedImage ? 'SELECT elections.data, photos.data AS photo_data FROM elections LEFT JOIN photos ON elections.photo_id = photos.id WHERE elections.id = ?' : 'SELECT data FROM elections WHERE id = ?';
+        const query = hasRequestedImage
+            ? 'SELECT elections.data, photos.data AS photo_data FROM elections LEFT JOIN photos ON elections.photo_id = photos.id WHERE elections.id = ?'
+            : 'SELECT data FROM elections WHERE id = ?';
         
         const row = db.prepare(query).get(code);
         
@@ -367,6 +378,92 @@ export class ElectionController {
             res.send(`No election with code ${code} found!`);
             
             return false;
+        }
+    }
+    
+    static retrieveVirtual(req, res) {
+        const code = req.params.electionCode;
+        
+        const db = dbWrapper.get();
+        
+        const hasRequestedImage = 'groupImage' in req.query;
+        
+        const query = hasRequestedImage
+            ? 'SELECT elections.data, photos.data AS photo_data, elections.voter_count FROM elections LEFT JOIN photos ON elections.photo_id = photos.id WHERE elections.id = ?'
+            : 'SELECT data, voter_count FROM elections WHERE id = ?';
+        
+        const row = db.prepare(query).get(code);
+        
+        if (row) {
+            const electionData = JSON.parse(row.data);
+            
+            const queryKeys = Object.keys(req.query);
+            
+            /** @type {Record<string, *>} */
+            let finalData = undefined;
+            
+            if (queryKeys.length > 0) {
+                finalData = {};
+                
+                queryKeys.forEach(queryKey => {
+                    if (electionData[queryKey]) {
+                        finalData[queryKey] = electionData[queryKey];
+                    }
+                });
+                // Also manually add photo if requested
+                if (hasRequestedImage) {
+                    finalData.groupImage = row.photo_data;
+                }
+            }
+            
+            if (!finalData || (Object.keys(finalData).length === 0 && finalData.constructor === Object)) {
+                finalData = electionData;
+            }
+            
+            res.json({ code: code, data: finalData, voterCount: row.voter_count });
+            
+            return true;
+        } else {
+            res.status(400);
+            res.send(`No election with code ${code} found!`);
+            
+            return false;
+        }
+    }
+    
+    static updateCandidateState(req, res) {
+        const formData = req.body;
+        
+        if (!formData) {
+            // No data given in body, send missing data error.
+            res.status(400);
+            res.send('No data given!');
+            return;
+        }
+        
+        const code = req.params.electionCode;
+        
+        const db = dbWrapper.get();
+        
+        const row = db.prepare('SELECT data FROM elections WHERE id = ?').get(code);
+        
+        if (row) {
+            const candidateData = formData;
+            
+            const electionData = JSON.parse(row.data);
+            
+            const candidate = electionData.candidates.find(candidate => candidate.name == candidateData.name);
+            
+            candidate.selectedState = candidateData.selectedState;
+            
+            const stringifiedData = JSON.stringify(electionData);
+            
+            db.prepare('UPDATE elections SET last_used = (datetime(\'now\', \'localtime\')), data = ? WHERE id = ?').run(stringifiedData, code);
+            
+            res.json({ data: electionData });
+        } else {
+            res.status(400);
+            res.send(`No election with code ${code} found!`);
         }
     }
     
