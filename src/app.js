@@ -185,11 +185,15 @@ export class ElectionController {
             
             const electionData = JSON.parse(row.data);
             
-            electionData.candidates = electionData.candidates.map(candidate => ({
-                name: candidate.name,
-                voteCount: 0,
-                selectedState: 'unselected'
-            }));
+            const isAdmin = 'admin' in req.query;
+            
+            if (!isAdmin) {
+                electionData.candidates = electionData.candidates.map(candidate => ({
+                    name: candidate.name,
+                    voteCount: 0,
+                    selectedState: 'unselected'
+                }));
+            }
             
             electionData.groupImage = row.photo_data;
             
@@ -198,7 +202,7 @@ export class ElectionController {
                 isElectionFinished: electionData.numberOfVoted == electionData.numberOfVoters
             };
             
-            if (!returnValue.isElectionFinished || 'admin' in req.query) {
+            if (!returnValue.isElectionFinished || isAdmin) {
                 returnValue.data = electionData;
             }
             
