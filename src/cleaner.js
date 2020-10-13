@@ -1,5 +1,6 @@
-import { SQLiteDatabase } from './database.js';
 import cron from 'cron';
+import { SQLiteDatabase } from './database.js';
+import { __dirname } from './variables.js';
 
 const { CronJob } = cron;
 
@@ -10,7 +11,11 @@ const job = new CronJob(
         
         if (dbWrapper.isOpen) {
             dbWrapper.execute(db => {
-                db.prepare('DELETE FROM elections WHERE last_used < datetime(\'now\', \'-1 day\', \'localtime\')').run();
+                try {
+                    db.prepare(`DELETE FROM elections WHERE last_used < datetime('now', '-1 day', 'localtime')`).run();
+                } catch (error) {
+                    console.log(error);
+                }
             });
         }
     }

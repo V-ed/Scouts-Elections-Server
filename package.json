@@ -2,7 +2,7 @@
   "name": "scouts-elections-server",
   "version": "1.0.0",
   "description": "The server to handle synchronization between multiple devices for a single election.",
-  "main": "app.js",
+  "main": "src/app.js",
   "type": "module",
   "scripts": {
     "lint": "eslint .",

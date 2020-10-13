@@ -1,6 +1,6 @@
 import express from 'express';
 import dateFormat from 'dateformat';
-import { setup } from '../src/router.js';
+import { setup } from '../router.js';
 
 const app = express();
 

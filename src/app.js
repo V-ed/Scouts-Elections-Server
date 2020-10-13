@@ -1,7 +1,7 @@
 import { SQLiteDatabase } from './database.js';
 import { __dirname } from './variables.js';
 
-const dbPath = process.env.NODE_ENV == 'prod' ? '../db/elections.db' : `../debug/db/elections${process.env.NODE_ENV ? '_' + process.env.NODE_ENV : ''}.db`;
+const dbPath = process.env.NODE_ENV == 'prod' ? './db/elections.db' : `./debug/db/elections${process.env.NODE_ENV ? '_' + process.env.NODE_ENV : ''}.db`;
 
 const dbWrapper = new SQLiteDatabase(`${__dirname}/${dbPath}`, db => {
     db.pragma('encoding = \'UTF-16\'');
@@ -14,6 +14,8 @@ const dbWrapper = new SQLiteDatabase(`${__dirname}/${dbPath}`, db => {
                     number_of_joined INTEGER DEFAULT 0,
                     last_used DATE DEFAULT (datetime('now', 'localtime')),
                     photo_id INTEGER DEFAULT NULL,
+                    type TEXT NOT NULL CHECK( type IN ('shared','virtual') ) DEFAULT 'shared',
+                    voter_count INTEGER DEFAULT 0,
                     data TEXT NOT NULL,
                     CONSTRAINT fk_photos FOREIGN KEY (photo_id) REFERENCES photos(id) ON DELETE CASCADE
         )
@@ -94,7 +96,57 @@ export class ElectionController {
                 return db.prepare('INSERT INTO photos(data) VALUES(?)').run(photoData).lastInsertRowid;
             }();
             
-            db.prepare('INSERT INTO elections(id, data, photo_id) VALUES(?, ?, ?)').run(code, jsonData, photoId);
+            db.prepare('INSERT INTO elections(id, data, photo_id, type) VALUES(?, ?, ?, ?)').run(code, jsonData, photoId, 'shared');
+            
+            res.json({ code: code, data: formData });
+        }
+    }
+    
+    static createVirtual(req, res) {
+        const formData = req.body;
+        
+        if (!formData) {
+            // No data given in body, send missing data error.
+            res.status(400);
+            res.send('No data given!');
+        } else {
+            /** @type {string} */
+            let code;
+            
+            const db = dbWrapper.get();
+            
+            do {
+                code = createCode(6);
+                
+                const row = db.prepare('SELECT id FROM elections WHERE id = ?').get(code);
+                
+                // If row present, code is invalid
+                if (row) {
+                    code = undefined;
+                }
+            } while (!code);
+            
+            const photoData = formData.groupImage;
+            
+            delete formData.groupImage;
+            
+            const jsonData = JSON.stringify(formData);
+            
+            const photoId = function() {
+                if (!photoData) {
+                    return undefined;
+                }
+                
+                const existingPhotoRow = db.prepare('SELECT id FROM photos WHERE data = ?').get(photoData);
+                
+                if (existingPhotoRow) {
+                    return existingPhotoRow.id;
+                }
+                
+                return db.prepare('INSERT INTO photos(data) VALUES(?)').run(photoData).lastInsertRowid;
+            }();
+            
+            db.prepare('INSERT INTO elections(id, data, photo_id, type) VALUES(?, ?, ?, ?)').run(code, jsonData, photoId, 'virtual');
             
             res.json({ code: code, data: formData });
         }
@@ -122,7 +174,30 @@ export class ElectionController {
     }
     
     static joinVirtual(req, res) {
-        ElectionController.join(req, res);
+        const db = dbWrapper.get();
+        
+        const code = req.params.electionCode;
+        
+        const row = db.prepare('SELECT elections.data, photos.data AS photo_data FROM elections LEFT JOIN photos ON elections.photo_id = photos.id WHERE elections.id = ?').get(code);
+        
+        if (row) {
+            db.prepare('UPDATE elections SET number_of_joined = number_of_joined + 1, last_used = (datetime(\'now\', \'localtime\')) WHERE id = ?').run(code);
+            
+            const electionData = JSON.parse(row.data);
+            
+            electionData.candidates = electionData.candidates.map(candidate => ({
+                name: candidate.name,
+                voteCount: 0,
+                selectedState: 'unselected'
+            }));
+            
+            electionData.groupImage = row.photo_data;
+            
+            res.json({ code: code, data: electionData });
+        } else {
+            res.status(400);
+            res.send(`No election with code ${code} found!`);
+        }
     }
     
     static vote(req, res) {
@@ -142,13 +217,10 @@ export class ElectionController {
             if (row) {
                 const electionData = JSON.parse(row.data);
                 
-                let votersArray = formData;
+                /** @type {*[]} */
+                const votersArray = formData;
                 
-                for (let i = 0; i < votersArray.length; i++) {
-                    const voterIndex = votersArray[i];
-                    
-                    electionData.candidates[voterIndex].voteCount++;
-                }
+                votersArray.forEach(voterIndex => electionData.candidates[voterIndex].voteCount++);
                 
                 electionData.numberOfVoted++;
                 
@@ -157,6 +229,42 @@ export class ElectionController {
                 db.prepare('UPDATE elections SET last_used = (datetime(\'now\', \'localtime\')), data = ? WHERE id = ?').run(stringifiedData, code);
                 
                 res.json({ data: electionData });
+            } else {
+                res.status(400);
+                res.send(`No election with code ${code} found!`);
+            }
+        }
+    }
+    
+    static voteVirtual(req, res) {
+        const formData = req.body;
+        
+        if (!formData) {
+            // No data given in body, send missing data error.
+            res.status(400);
+            res.send('No data given!');
+        } else {
+            const code = req.params.electionCode;
+            
+            const db = dbWrapper.get();
+            
+            const row = db.prepare('SELECT data FROM elections WHERE id = ?').get(code);
+            
+            if (row) {
+                const electionData = JSON.parse(row.data);
+                
+                /** @type {*[]} */
+                const votersArray = formData;
+                
+                votersArray.forEach(voterIndex => electionData.candidates[voterIndex].voteCount++);
+                
+                electionData.numberOfVoted++;
+                
+                const stringifiedData = JSON.stringify(electionData);
+                
+                db.prepare('UPDATE elections SET last_used = (datetime(\'now\', \'localtime\')), data = ?, voter_count = voter_count + 1 WHERE id = ?').run(stringifiedData, code);
+                
+                res.send('Successfully sent votes!');
             } else {
                 res.status(400);
                 res.send(`No election with code ${code} found!`);

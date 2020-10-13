@@ -12,7 +12,7 @@
 				"<node_internals>/**"
 			],
 			"runtimeExecutable": "nodemon",
-			"program": "${workspaceFolder}/debug/debugger.js",
+			"program": "${workspaceFolder}/src/debug/debugger.js",
 			"restart": true,
 			"protocol": "inspector"
 		}
