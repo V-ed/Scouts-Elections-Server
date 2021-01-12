@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/node-cron": "^2.0.3",
-    "dateformat": "^3.0.3",
+    "dateformat": "^4.4.1",
     "eslint": "^7.11.0",
     "pre-commit": "^1.2.2"
   }
